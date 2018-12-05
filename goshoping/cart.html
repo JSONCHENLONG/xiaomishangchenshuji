@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			*{
+				padding: 0;
+				margin: 0;
+			}
+			ul{
+				list-style: none;
+			}
+			.title{
+				width: 800px;
+				margin: 20px auto;
+				font-size: 20px;
+				font-weight: bold;
+			}
+			.title:after{
+				content: " ";
+				display: block;
+				clear: both;
+			}
+			.title li{
+				width: 130px;
+				line-height: 30px;
+				float: left;
+				text-align: center;
+				border-right: 2px solid #AABBCC;
+			}
+			.title li:last-child{
+				border-right: none;
+			}
+			.line{
+				width: 800px;
+				margin: 20px auto;
+			}
+			.carts{
+				width: 800px;
+				margin: 20px auto;
+				border: 3px solid #CCCCCC;
+			}
+			.carts .title{
+				height: 120px;
+			}
+			.carts .title li{
+				height: 120px;
+				line-height: 120px;
+				border-bottom: 2px dotted #CCCCCC;
+				border-top: 2px dotted #CCCCCC;
+				margin-bottom: 5px;
+			}
+			.carts .title li img{
+				height: 100px;
+			}
+			.carts .title li p{
+				padding: 5px 0;
+			}
+			.carts .title li input[type=button]{
+				width: 20px;
+				height: 20px;
+				border-radius: 50%;
+			}
+			#footer li{
+				width: 180px;
+			}
+		</style>
+	</head>
+	<body>
+		<div><a href="index.html">返回商品页</a></div>
+		<ul class="title">
+			<li><input id="checkAll" type="checkbox"/>&emsp;全选</li>
+			<li>商品</li>
+			<li>数量</li>
+			<li>单价</li>
+			<li>操作</li>
+			<li>总价</li>
+		</ul>
+		<div class="line"><hr /></div>
+		<div class="carts">
+			<!--<ul class="title">
+				<li><input type="checkbox"/></li>
+				<li>
+					<p><img src="img/C语言.jpg"/></p>
+				</li>
+				<li><span>3</span></li>
+				<li><span>60</span></li>
+				<li><input type="button" value="-"/>&nbsp;|&nbsp;<input type="button" value="+"/></li>
+				<li><span>0</span></li>
+			</ul>-->
+		</div>
+		<div class="line"><hr /></div>
+		
+		<ul id="footer" class="title">
+			<li><input id="deslection" type="checkbox"/>&emsp;取消选择</li>
+			<li>商品总数：<span id="totalCount">0</span></li>
+			<li>需付金额：<span id="totalPrice">0</span></li>
+			<li><input id="delCartGoods" type="button" value="删除所选商品" /></li>
+		</ul>
+	</body>
+</html>
+<script src="js/jquery.min.js"></script>
+<script type="text/javascript">
+	//显示商品信息的条件
+	//从localstorage.getItem(键名),
+	//哪个用户登录就拿哪个用户的购物车信息。
+	//得到当前登录用户的用户名
+	//bid count
+	//去数据库里合所有商品的信息。
+	//goods.json
+	
+	window.onload = function(){
+		var obj = {
+			//获取登录用户名
+			userName : location.search.split("=")[1],
+			carts : $(".carts"),//购物车商品信息容器
+			checkAll : $("#checkAll"),//全选按钮
+			totalCount : $("#totalCount"),//商品总条数显示框
+			totalPrice : $("#totalPrice"),//商品总价格显示框
+			delCartGoods : $("#delCartGoods"),//删除购物车商品按钮
+			deslectionBtn : $("#deslection"),//取消选择按钮
+		}
+		//实现购物车功能
+		new ShowCartGoodsInfo(obj);
+	}
+	
+	class ShowCartGoodsInfo{
+		constructor(obj){
+			this.userName = obj.userName;//从哪来？
+			this.carts = obj.carts;//购物车商品信息容器
+			this.checkAll = obj.checkAll;//选择所有
+			this.totalCount = obj.totalCount;//显示所选商品总条数
+			this.totalPrice = obj.totalPrice;//显示所选商品总价格
+			this.delCartGoods = obj.delCartGoods;//删除购物车商品
+			this.deslectionBtn = obj.deslectionBtn;//取消选择按钮
+			this.getCartGoods();//获取购物车保存的商品信息
+			this.getGoods();//获取所有商品信息
+		};
+		getCartGoods(){
+			//判断购物车信息是否存在
+			if(localStorage.getItem(this.userName + "Goods")){
+				//购物车商品信息存在
+				//获取购物车商品信息
+				var cartGoods = localStorage.getItem(this.userName + "Goods");
+				//将cartGoods转换成json格式的对象
+				var cartGoodsArr = JSON.parse(cartGoods);
+				//添加cartGoodsInfo属性，用于保存所有购物车信息，以数组形式存在。
+				this.cartGoodsInfo = cartGoodsArr;
+			}else{
+				//购物车没有商品信息，将cartGoodsInfo置为null;
+				this.cartGoodsInfo = null;
+			}
+			
+		};
+		getGoods(){
+			var _this = this;
+			//服务器请求所有商品数据。
+			$.getJSON("goods.json",function(res){
+				//保存商品数据。
+				_this.goods = res;
+				//所有商品拿到后，开始来和购物车保存的信息比较，通过购物车的bid与商品中的bid比较
+				//把对应的商品信息显示在页面。
+				_this.showCartGoodsInfo(res);
+				
+			})
+		};
+		showCartGoodsInfo(res){//res接收服务器传递过来的所有商品数据
+			//判断是否有购物车商品数据。
+			if(this.cartGoodsInfo){
+				//购物车商品存在 
+				//str用来保存将要面页面显示的html结构，用于展示购物车商品信息
+				var str = "";
+				for (var i = 0; i < res.length; i++) {
+					for(var j = 0; j<this.cartGoodsInfo.length; j++){
+						//根据购物车信息中商品的编号bid从所有商品数据中获取需要的商品数据。
+						if(res[i].bid == this.cartGoodsInfo[j].bid){
+							str += `
+								<ul class="title">
+									
+									<li>
+										<input class="checkOne" type="checkbox"/>
+										<input class="goodBid" type="hidden" value="${this.cartGoodsInfo[j].bid}"/>
+									</li>
+									<li>
+										<p><img src="img/${res[i].src}"/></p>
+									</li>
+									<li><span class="goodCount">${this.cartGoodsInfo[j].count}</span></li>
+									<li><span class="goodPrice">${res[i].price}</span></li>
+									<li><input class="del" type="button" value="-"/>&nbsp;|&nbsp;<input class="add" type="button" value="+"/></li>
+									<li><span class="goodTotalPrice">${Number(this.cartGoodsInfo[j].count)*Number(res[i].price)}</span></li>
+								</ul>
+							`;
+						}
+					}
+				}
+				//把商品数据显示在页面中
+				this.carts.html(str);
+			}
+			/*
+			 * 只有把商品数据完全显示在页面中，才能实现购物车的增删改。
+			 * 否则无法操作。
+			 */
+			//实现购物车的增删改。
+			new SelectCart(this);
+		}
+	}
+	//创建SelectCart类，用于实现购物车的增删改功能。
+	class SelectCart{
+		constructor(obj){
+			this.goods = obj.goods;//所有商品
+			this.userName = obj.userName;//当前用户名
+			this.checkAll = obj.checkAll;//选择所有
+			this.carts = obj.carts;//购物车商品信息容器
+			this.deslectionBtn = obj.deslectionBtn;//取消选择按钮
+			this.totalCount = obj.totalCount;//显示所选商品总条数按钮
+			this.totalPrice = obj.totalPrice;//显示所选商品总价格按钮
+			this.delCartGoods = obj.delCartGoods;//删除所选商品按钮
+			this.selectAll();//实现选择所有功能
+			this.selectOne();//单个选择功能。
+			this.deselection();//取消选择
+			this.updateCart(1,".add");//购物车添加一条商品信息
+			this.updateCart(-1,".del");//购物车删除一条商品信息
+			this.deletCartGoodsInfo();//删除所有选中商品
+			//创建对象， 实现购物车计算功能
+			this.computeCart = new ComputeCart(this.userName,this.goods);//购物车计算功能实现
+		};
+		//选择所有。
+		selectAll(){
+			//选择所有的表示单个商品的复选框
+			var checkOne = this.carts.find(".checkOne");
+			//保存当前对象
+			var _this = this;
+			//全选按钮的单击事件，实现选择所有功能。
+			this.checkAll.click(function(){
+				//当单击全选按钮，则表示单个商品的复选框全部选中或取消选中
+				checkOne.prop("checked",$(this).prop("checked"));
+				//全部选中后，此时的全选按钮应为禁用状态。
+				$(this).prop("disabled",true);
+				//只要点击了全选按钮就可以点击取消选择按钮
+				_this.deslectionBtn.prop("checked",false).prop("disabled",false);
+			
+				//计算功能实现
+				//查找到显示商品条数的元素标签
+				var goodsCount = _this.carts.find(".goodCount");
+				//查找到保存商品编号bid的隐藏域。
+				var goodBid = _this.carts.find(".goodBid");
+				//用于计算选中商品的总条数
+				var totalCount = 0;
+				//用于计算选中商品的总金额。
+				var totalPrice = 0;
+				//遍历所有查找到的显示商品条数的元素标签，目的是为了计算商品的总条数和总金额
+				for (var i = 0; i < goodsCount.length; i++) {
+					//保存当前商品编号
+					_this.computeCart.setBid(goodBid.eq(i).val());
+					//保存当前商品条数
+					_this.computeCart.setGoodCount();
+					//保存当前商品单价
+					_this.computeCart.setGoodPrice();
+					//计算所有商品总条数
+					totalCount += _this.computeCart.count;
+					//计算所有商品总价。
+					totalPrice += _this.computeCart.count * _this.computeCart.price;
+				}
+				//在页面中显示商品总条数
+				_this.totalCount.html(totalCount);
+				//在页面中显示商品总价。
+				_this.totalPrice.html(totalPrice);
+			});
+		};
+		//选择单个。
+		selectOne(){
+			//选择所有的表示单个商品的复选框
+			var checkOne = this.carts.find(".checkOne");
+			//保存当前对象
+			var _this = this;
+			//点击单个商品的复选框
+			checkOne.click(function(){
+				//判断是否有没被选中的商品，true表示所有的都被选中了，false表示最少有一个没被选中
+				var flag = true;
+				//判断是否有商品是被选中的，false表示所有的都没有被选中，true表示最少有一个是选中的。
+				var hasChecked = false;
+				for (var i = 0; i < checkOne.length; i++) {
+					if(!checkOne.eq(i).prop("checked")){
+						flag = false;//最少有一个没被选中
+					}else{
+						hasChecked = true;//最少有一个是选中的
+					}
+				}
+				if(!flag){//如果有一个没被选中
+					//全选按钮可以点击了，状态设置为未选中状态。
+					_this.checkAll.prop("checked",false).prop("disabled",false);
+				}else{//所有的都被选中了
+					//全选按钮禁止点击，状态设置为选中状态。
+					_this.checkAll.prop("checked",true).prop("disabled",true);
+				}
+				if(hasChecked){//只要有一个被选中，就可以点击取消选择按钮
+					//取消选择按钮可以点击了，状态设置为未选中状态。
+					_this.deslectionBtn.prop("checked",false).prop("disabled",false);
+				}else{//所有商品都未选中，取消选择按钮则无法点击
+					//取消选择按钮禁止点击，状态设置为选中状态。
+					_this.deslectionBtn.prop("checked",true).prop("disabled",true);
+				}
+				//计算功能实现
+				//查找到显示商品条数的元素标签
+				var goodsCount = _this.carts.find(".goodCount");
+				//查找到保存商品编号bid的隐藏域。
+				var goodBid = _this.carts.find(".goodBid");
+				//用于计算选中商品的总条数
+				var totalCount = 0;
+				//用于计算选中商品的总金额。
+				var totalPrice = 0;
+				for (var i = 0; i < checkOne.length; i++) {
+					if(checkOne.eq(i).prop("checked")){
+						//保存当前商品编号
+						_this.computeCart.setBid(goodBid.eq(i).val());
+						//保存当前商品条数
+						_this.computeCart.setGoodCount();
+						//保存当前商品单价
+						_this.computeCart.setGoodPrice();
+						//console.log(_this.computeCart.count);
+						//计算选中的商品总条数
+						totalCount += _this.computeCart.count;
+						//计算选中的商品总价。
+						totalPrice += _this.computeCart.count * _this.computeCart.price;
+					}
+				}
+				//在页面显示所有选中商品条数
+				_this.totalCount.html(totalCount);
+				//在页面显示所有选中商品总价
+				_this.totalPrice.html(totalPrice);
+			})
+		};
+		//取消选择。
+		deselection(){
+			var _this = this;
+			//选择所有的表示单个商品的复选框
+			var checkOne = this.carts.find(".checkOne");
+			//点击取消选择按钮
+			this.deslectionBtn.click(function(){
+				//全选按钮可以点击了，状态设置为未选中状态。
+				_this.checkAll.prop("checked",false).prop("disabled",false);
+				//所有的表示单个商品的复选框，都为未选中状态。
+				checkOne.prop("checked",false);
+				//消选择按钮此时为禁止状态，不能被再次点击。
+				$(this).prop("disabled",true);
+				//没有商品被选中，商品总条数当然为0啊
+				_this.totalCount.html(0);
+				//没有商品被选中，商品总价也必须为0啊，不用付钱了
+				_this.totalPrice.html(0);
+			});
+		};
+		/*
+		 * updateCart()方法用来实现add和del功能，点击+按钮增加1个商品，点击-按钮删除一个商品
+		 * num表示要删除或增加商品的个数
+		 * className为删除或增加商品的按钮的class名称
+		 */
+		updateCart(num,className){
+			//初始化单个商品的复选框为null
+			var checkOne = null;
+			var _this = this;
+			//为删除或增加商品的按钮添加click事件
+			this.carts.delegate(className,"click",function(){
+				//console.log(1,num);
+				//获取当前商品编号
+				var bid = $(this).parent().parent().find(".goodBid").val();
+				//保存当前商品编号
+				_this.computeCart.setBid(bid);
+				//保存当前商品条数
+				_this.computeCart.setGoodCount();
+				//保存当前商品单价
+				_this.computeCart.setGoodPrice();
+				//当前商品条数加1
+				_this.computeCart.updateCount(num);
+				
+				//当前商品条数小于0时，删除当前商品信息，删除购物车保存的当前商品信息。
+				if(_this.computeCart.count < 0){
+					//删除当前商品信息
+					$(this).parent().parent().remove();
+					//删除购物车保存的当前商品信息。
+					_this.computeCart.delCartGood();
+					/*
+					 * 因为当商品条数小于0后，该条商品在页面被删除了，但是原来被选中的该条商品数据仍存留在
+					 * 内存中没被销毁,以下三个方法重新执行，是为了重新初始化当前页面数据。
+					 */
+					_this.selectOne();
+					_this.updateCart(0,".add");
+					_this.updateCart(0,".del");
+				}else{
+					//显示当前商品数据
+					$(this).parent().parent().find(".goodCount").html(_this.computeCart.count);
+					//计算当前商品总价
+					$(this).parent().parent().find(".goodTotalPrice").html(_this.computeCart.count*_this.computeCart.price);
+				}
+				checkOne = _this.carts.find(".checkOne");
+				//计算所选商品总条数和总价格
+				var totalCount = 0;//总条数
+				var totalPrice = 0;//总价格
+				
+				for (var i = 0; i < checkOne.length; i++) {
+					//找到所有被选中的商品
+					if(checkOne.eq(i).prop("checked")){
+						//把选中的商品条数累加
+						totalCount += Number(_this.carts.find(".goodCount").eq(i).html());
+						//把选中的商品价格累加
+						totalPrice += Number(_this.carts.find(".goodTotalPrice").eq(i).html());
+					}
+				}
+				_this.totalCount.html(totalCount);//显示总条数
+				_this.totalPrice.html(totalPrice);//显示总价格
+				//更新localstorage数据
+				_this.computeCart.setLocalstorage();
+				//更新当前数据
+				//_this.computeCart.getCart();
+				
+			});
+		};
+		deletCartGoodsInfo(){
+			var _this = this;
+			var checkOne = this.carts.find(".checkOne");
+			//点击删除所选商品
+			this.delCartGoods.click(function(){
+				//遍历所有选中商品
+				//alert(11)
+				for (var i = 0; i < checkOne.length; i++) {
+					if(checkOne.eq(i).prop("checked")){
+						//设置选中商品的编号
+						_this.computeCart.setBid(checkOne.eq(i).parent().parent().find(".goodBid").val());
+						//删除已显示的选中商品。
+						checkOne.eq(i).parent().parent().remove();
+						//删除选中的购物车商品。
+						_this.computeCart.delCartGood();
+					}
+				}
+				_this.totalCount.html(0);//总条数置为0
+				_this.totalPrice.html(0);//总价格置为0
+				
+				/*
+				 * 因为当选中商品被删除后，但是原来被选中的这些商品数据仍存留在
+				 * 内存中没被销毁,以下三个方法重新执行，是为了重新初始化当前页面数据。
+				 */
+				_this.selectOne();
+				_this.updateCart(0,".add");
+				_this.updateCart(0,".del");
+			});
+		}
+	}
+	class ComputeCart{
+		constructor(userName,goods){
+			this.goods = goods;//所有商品
+			this.bid = "";//商品编号 
+			this.userName = userName;//用户名
+			this.cartArr = null;//保存购物车信息
+			this.count = 0;//购物车的单个商品数量
+			this.price = 0;//购物车的单个商品单价
+			this.getCart();//获取购物车商品信息。
+		};
+		//获取购物车商品信息
+		getCart(){
+			if(localStorage.getItem(this.userName+"Goods")){
+				var cartStr = localStorage.getItem(this.userName+"Goods");
+				//将购物车中的商品信息暂时保存下来。
+				this.cartArr = JSON.parse(cartStr); 
+			}else{
+				this.cartArr = null;
+			}
+		};
+		//设置当前商品编号，表示要操作的是当前商品。
+		setBid(bid){
+			//将当前商品的编号保存下来。
+			this.bid = bid;
+		}
+		//根据当前商品编号设置商品条数
+		setGoodCount(){
+			if(this.cartArr){//如果购物车商品信息存在 ，则可以计算当前商品的条数了。
+				for (var i = 0; i < this.cartArr.length; i++) {
+					if(this.cartArr[i].bid == this.bid){
+						//保存当前商品的条数
+						this.count = Number(this.cartArr[i].count);
+					}
+				}
+			}
+		};
+		//根据当前商品编号设置商品单价
+		setGoodPrice(){
+			//从所有商品数据中找到对应编号的商品单价
+			for (var i = 0; i < this.goods.length; i++) {
+				if(this.goods[i].bid == this.bid){
+					//保存当前商品的单价
+					this.price = this.goods[i].price;
+				}
+			}
+		};
+		//根据num更新当前商品个数
+		updateCount(num){
+			//在原来商品个数的基础上更新num个当前商品。
+			this.count += num;
+		};
+		//根据现有的商品个数更新购物车中的商品信息。
+		setLocalstorage(){
+			var storageStr = localStorage.getItem(this.userName + "Goods");
+			var storageArr = JSON.parse(storageStr);
+			for (var i = 0; i < storageArr.length; i++) {
+				if(storageArr[i].bid == this.bid){
+					//因为该商品个数更新了，所有购物车里的该商品个数也要随之更新。
+					storageArr[i].count = this.count;
+				};
+			}
+			var storageJson = JSON.stringify(storageArr);
+			//更新购物车中的商品信息。
+			localStorage.setItem(this.userName + "Goods",storageJson);
+		};
+		//删除购物车中该条商品信息。
+		delCartGood(){
+			var storageStr = localStorage.getItem(this.userName + "Goods");
+			var storageArr = JSON.parse(storageStr);
+			for (var i = 0; i < storageArr.length; i++) {
+				if(storageArr[i].bid == this.bid){
+					//删除整条该商品信息
+					storageArr.splice(i,1);
+					//该条商品信息已经删除，无需再循环了。
+					break;
+				};
+			}
+			var storageJson = JSON.stringify(storageArr);
+			//该条商品信息删除后，购物车中的商品信息也需要更新的。
+			localStorage.setItem(this.userName + "Goods",storageJson);
+		}
+	}
+</script>

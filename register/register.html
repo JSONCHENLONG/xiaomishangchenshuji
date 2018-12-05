@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>zhuce</title>
+		<link rel="stylesheet" href="css/zhuce.css" />
+	</head>
+
+	<body>
+		<div class="head-mkm">
+		<div class="sdqw">
+			<div class="nav-logo"><img src="images/logo-footer.png"></div>
+			<div class="actions-auto">
+				<div class="zhuce">
+					<span class="demolq">注册小米账号</span>
+				</div>
+
+				<div class="guojia">
+					<span class="demoll">国家/地区</span>
+				</div>
+				<div class="zhongguo">
+					<select name="nation" id="zhong">
+						<option value="america">美国</option>
+						<option value="gsdsd" selected="selected">中国</option>
+						<option value="germany">德国</option>
+						<option value="china">中国</option>
+					</select>
+				</div>
+				<div class="chenggong">
+					<span class="chengondd">成功注册账号后，国家地区将不能被修改</span>
+				</div>
+
+				<form action="register.php" method="post" class="form">
+					<div class="yohuming">用户名：<input id="uname" type="text" name="uname" /></div>
+					<div class="mima">密码：<input id="upwd" type="password" name="upwd" /></div>
+					<div class="zhuceanniu"><input id="sub" type="submit" value="注册" disabled="disabled"></div>
+					<div class="gou">
+						<span>注册账号即表示您同意并愿意遵守小米<em>用户协议</em>和<em>隐私政策</em></span>
+					</div>
+				</form>
+
+				<div class="jianti"><span>简体 | 繁体 | English | 常见问题</span></div>
+				<!--<div class="ledd">
+					<span class="oklo">小米公司版权所有-京ICP备11010802020134-京icp-小米公司版权所有</span>
+				</div>-->
+         </div>
+	</body>
+
+</html>
+<script src="../jquery.min.js"></script>
+<script type="text/javascript">
+	var uname = document.getElementById("uname");
+	var sub = document.getElementById("sub");
+	//用户名唯一验证
+	uname.onblur = function() {
+		//		ajax({
+		//			method:"get",
+		//			url:"unameCheck.php",
+		//			data:{
+		//				uname : this.value
+		//			},
+		//			success:function(res){
+		//				//用户名存在 ok
+		//				if(res == "ok"){
+		//					alert("用户名已存在");
+		//					sub.setAttribute("disabled","disabled");
+		//				}else if(res == "no"){
+		//					//用户名不存在 no
+		//					alert("可用");
+		//					//让submit按钮启用点击功能
+		//					sub.removeAttribute("disabled");
+		//				}
+		//			}
+		//		});
+		$.ajax({
+			type: "get",
+			url: "unameCheck.php",
+			data: {
+				uname: this.value
+			},
+			success: function(res) {
+				//用户名存在 ok
+				console.log(res)
+				if(res == "ok") {
+					alert("用户名已存在");
+					sub.setAttribute("disabled", "disabled");
+				} else if(res == "no") {
+					//用户名不存在 no
+					alert("输入正确");
+					//让submit按钮启用点击功能
+					sub.removeAttribute("disabled");
+				}
+			}
+		});
+		console.log(1)
+	}
+</script>

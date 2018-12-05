@@ -1,0 +1,253 @@
+* {
+	padding: 0;
+	margin: 0;
+}
+
+ul {
+	list-style: none;
+}
+
+img {
+	display: block;
+}
+
+.clearfix::after {
+	content: "";
+	display: block;
+	clear: both;
+	visibility: hidden;
+	height: 0;
+}
+
+a {
+	text-decoration: none;
+	color: #fff;
+}
+
+.head {
+	width: 1349px;
+	height: 98px;
+	/*background:blue;*/
+}
+
+.header-logo {
+	width: 48px;
+	height: 48px;
+	background: orangered;
+	float: left;
+	margin-left: 110px;
+	line-height: 48px;
+	text-align: center;
+	margin-top: 26px;
+}
+
+.michen {
+	width: 130px;
+	height: 48px;
+	background: blue;
+	float: left;
+	margin-left: 23px;
+	margin-top: 26px;
+}
+
+.bannerta {
+	width: 1349px;
+	height: 465px;
+	background: url(../images/ppt_02.gif);
+	background-repeat: repeat-x;
+	/*margin-top: 26px;*/
+	float: left;
+}
+
+.form-box {
+	width: 411px;
+	height: 433px;
+	background:white;
+	margin-top: 32px;
+	float: right;
+	margin-right: 109px;
+	
+}
+
+.form-box .form-group {
+	margin: 0 auto;
+	text-align: center;
+	margin-left: 31px;
+	margin-top: 32px;
+}
+
+.form-box .form-group .left-oop {
+	width: 174px;
+	height: 30px;
+	background: white;
+	float: left;
+	font-size: 21px;
+	color: orangered;
+}
+
+.form-box .form-group .right-ool {
+	width: 174px;
+	height: 30px;
+	background: white;
+	float: left;
+	font-size: 21px;
+	color: black;
+}
+
+p {
+	margin: 0;
+	padding: 0;
+	margin-left: 20px;
+	float: left;
+}
+
+.dal input {
+	width: 348px;
+	height: 49px;
+	margin-top: 32px;
+	float: left;
+	border: 1px solid black;
+}
+
+.password input {
+	width: 348px;
+	height: 49px;
+	margin-top: 14px;
+	float: left;
+	border: 1px solid black;
+}
+
+.kom .q {
+	width: 348px;
+	height: 49px;
+	margin-left: 31px;
+	margin-top: 14px;
+	float: left;
+	background: #EF5B00;
+	text-align: center;
+	line-height: 49px;
+	font-size: 14px;
+}
+
+.btn {
+	width: 348px;
+	height: 49px;
+	background: #EF5B00;
+}
+
+.oou {
+	width: 348px;
+	height: 14px;
+	/*background:blue;*/
+	float: left;
+	margin-top: 14px;
+	line-height: 14px;
+	margin-left: 31px;
+}
+
+.oou .shoji {
+	float: left;
+	color: #EF5B00;
+}
+
+.oou .szuce {
+	float: right;
+	color: # 999999;
+}
+
+.coco {
+	text-align: center;
+	height: 14px;
+	line-height: 14px;
+	/*background:aqua;*/
+	float: left;
+	margin-left: 164px;
+	margin-top: 32px;
+}
+
+.form-box p {
+	padding: 6px 10px;
+}
+
+.btn btn-success {
+	margin: 0 auto;
+	text-align: center;
+}
+
+.qita {
+	margin: 0;
+	padding: 0;
+	margin-left: 20px;
+	float: left;
+}
+
+.lom {
+	width: 348px;
+	height: 30px;
+	/*background:url(images/a1_06.gif);*/
+	float: left;
+	margin-top: 16px;
+	margin-left: 32px;
+}
+
+.coma {
+	width: 31px;
+	height: 30px;
+	/*background: url(../images/a1_06.gif);*/
+	float: left;
+	margin-left: 57px;
+}
+
+.comb {
+	width: 31px;
+	height: 30px;
+	/*background: url(../images/a2_08.gif);*/
+	float: left;
+	margin-left: 38px;
+}
+
+.comc {
+	width: 31px;
+	height: 30px;
+	/*background: url(../images/a3_10.gif);*/
+	float: left;
+	margin-left: 30px;
+}
+
+.comd {
+	width: 31px;
+	height: 30px;
+	/*background: url(../images/a4_12.gif);*/
+	float: left;
+	margin-left: 30px;
+}
+
+.jio {
+	width: 406px;
+	height: 193px;
+	/*background:red;*/
+	float: right;
+	margin-right: 109px;
+}
+
+.pop {
+	width: 1349px;
+	height: 14px;
+	/*background:blue;*/
+	float: left;
+	margin: 0 auto;
+	font-size: 14px;
+	line-height: 14px;
+	text-align: center;
+}
+
+.ledd {
+	width: 1349px;
+	height: 15px;
+	/*background: pink;*/
+	float: left;
+	font-size: 15px;
+	line-height: 15px;
+	text-align: center;
+	margin-top: 24px;
+}

@@ -1,0 +1,169 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+ul {
+	list-style: none;
+}
+
+a {
+	text-decoration: none;
+}
+
+body {
+	width: 100%;
+}
+.wew{
+	color: orange;
+}
+
+/*#erjidaohang {
+	position: absolute;
+	z-index: 100;
+	border-top: 1px solid black;
+	width: 100%;
+	margin: auto auto;
+	display: none;
+
+}*/
+
+.erji {
+	width: 100%;
+	margin: auto auto;
+	display: flex;
+	justify-content: space-between;
+	background: white;
+	position: absolute;
+	/* left: 80px; */
+}
+
+.erji li {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 204px;
+	position: relative;
+}
+
+.erji li+li::after {
+	content: "";
+	display: table;
+	border: 1px solid #B0B0B0;
+	height: 100px;
+	position: absolute;
+	left: 0px;
+	top: 20px;
+}
+
+
+.logo a:nth-child(2) {
+	margin: 0 10px;
+}
+
+.logoNav {
+	display: flex;
+}
+
+.logoNav li {
+	margin-right: 10px;
+}
+
+.headerSearch {
+	/* margin-right: 50px; */
+	height: 50px;
+}
+
+.pic {
+	width: 1226px;
+	margin: auto auto;
+	height: 460px;
+	position: relative;
+}
+
+.pic0 {
+	/* margin-left: 50px; */
+	position: absolute;
+}
+
+.leftPic {
+	width: 234px;
+	height: 460px;
+	position: absolute;
+	/* margin-left: 50px; */
+	z-index: 10;
+	color: white;
+	display: flex;
+	opacity: 0.6;
+	flex-direction: column;
+	justify-content: center;
+	background: #333;
+}
+
+.leftPic li {
+	height: 42px;
+	line-height: 42px;
+}
+
+.leftPic a {
+	color: white;
+	padding-left: 30px;
+}
+
+.pic {
+	position: relative;
+}
+
+.pic .pic0 img {
+	height: 460px;
+	width: 1226px;
+}
+
+.lunbobtn {
+	z-index: 100;
+	position: absolute;
+	right: 30px;
+	left: auto;
+	top: 400px;
+}
+
+
+
+.main {
+	margin-top: 26px;
+	background: #f5f5f5;
+	overflow: hidden;
+}
+
+.main-top {
+	width: 1226px;
+	margin: auto auto;
+	display: flex;
+	justify-content: space-between;
+	margin-top: 30px;
+}
+
+.main-bottom {
+	width: 1226px;
+	margin: auto auto;
+	display: flex;
+	margin-top: 23px;
+}
+
+.mainbottomright {
+	margin-left: 23px;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+
+.mainbottomright li {
+	width: 234px;
+	height: 300px;
+	border: 1px solid red;
+	display: flex;
+	flex-direction: column;
+	justify-items: center;
+	align-items: center;
+	background: white;
+}

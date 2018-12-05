@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			*{
+				padding: 0;
+				margin: 0;
+			}
+			#login{
+				width: 300px;
+				margin: 100px auto;
+				border: 1px solid black;
+				font-size: 20px;
+			}
+			#login p{
+				line-height: 50px;
+				padding: 10px;
+				
+			}
+			#login input{
+				height: 25px;
+			}
+			#login p:last-child{
+				text-align: center;
+			}
+			#login p:last-child input{
+				width: 100px;
+				height: 30px;
+				border-radius: 15px;
+			}
+			ul{
+				list-style: none;
+			}
+			#goods{
+				width: 800px;
+				margin:50px auto;
+				border: 2px solid green;
+				min-height: 300px;
+				overflow: hidden;
+				display: none;
+			}
+			#goods ul {
+				width: 800px;
+			}
+			#goods ul li{
+				width: 178px;
+				border: 1px solid red;
+				overflow: hidden;
+				margin: 10px;
+				float: left;
+			}
+			#goods ul li img{
+				width: 180px;
+				height: 190px;
+				border-bottom: 1px solid blue;
+			}
+			#goods ul li p{
+				font-size: 12px;
+				padding-left: 5px;
+				line-height: 20px;
+				border-bottom: 1px dashed #C0C0C0;
+			}
+			#goods ul li p:last-child{
+				line-height: 40px;
+				font-size: 18px;
+				text-align: center;
+				font-weight: bold;
+				border-bottom: none;
+				background: darkblue;
+				color: wheat;
+				cursor: pointer;
+			}
+			#goods ul li p:last-child:hover{
+				font-size: 20px;
+			}
+			#cart{
+				width: 50px;
+				position: absolute;
+				right: 0px;
+				top: 50px;
+				display: none;
+			}
+			#cartImg{
+				position: absolute;
+				width: 60px;
+			}
+			#cartImg img{
+				width: 30px;
+				height: 30px;
+				vertical-align: middle;
+			}
+			#cartImg span{
+				display: inline-block;
+				line-height: 50px;
+				font-size: 12px;
+				color: green;
+				padding:0 5px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="login">
+			<p>
+				用户名：<input type="text" value=""/>
+			</p>
+			<p>
+				密&ensp;&ensp;码：<input type="password" value=""/>
+			</p>
+			<p>
+				<input id="btn" type="button" value="登录" />
+			</p>
+		</div>
+		<div id="goods">
+			<!--<ul>
+				<li>
+					<img src="img/ASP.NET.jpg"/>
+					<p><span>编号：</span><span>001</span></p>
+					<p><span>书名：</span><span>ASP.NET</span></p>
+					<p><span>作者：</span><span>XXX</span></p>
+					<p><span>出版日期：</span><span>XXX</span></p>
+					<p><span>出版社：</span><span>XXX</span></p>
+					<p><span>单价：</span><span>XXX</span></p>
+					<p>加入购物车</p>
+				</li>
+			</ul>
+			-->
+		</div>
+		
+		<div id="cart">
+			<div id="cartImg"><a id="cartBtn" href="cart.html"><img src="img/cart.jpg"/><span id="cartGoodsNum">0</span></a></div>
+		</div>
+	</body>
+</html>
+<script src="js/jquery.min.js"></script>
+<script type="text/javascript">
+	
+	//实现登录
+	//登录成功后显示商品信息页
+	//点南购物车添加购物车信息
+	//点击购物车按键，跳转到购物车页面
+	//
+	
+	window.onload = function(){
+		
+		var obj = {
+			btn : $("#btn"),
+			userName : $(":text"),
+			pwd : $(":password"),
+			loginBox : $("#login"),
+			goodsBox : $("#goods"),
+			cartBtn : $("#cartBtn"),
+			cartGoodsNum : $("#cartGoodsNum"),
+			cartBox : $("#cart"),
+		}
+		new GoShoping(obj);
+	}
+	
+	
+	class GoShoping{
+		
+		constructor(obj){
+			//定义登录按钮属性
+			this.btn = obj.btn;
+			this.userNameObj = obj.userName;
+			this.loginBox = obj.loginBox;
+			this.goodsBox = obj.goodsBox;
+			this.cartBox = obj.cartBox;
+			this.cartBtn = obj.cartBtn;
+			this.cartGoodsNum = obj.cartGoodsNum;
+			this.pwd = obj.pwd;
+			//实现登录
+			this.login();
+		};
+		login(){
+			var _this = this;
+			//点击登录
+			this.btn.click(function(){
+				_this.userName = _this.userNameObj.val();
+				var pro = new Promise(function(suc,fail){
+					$.ajax({
+						type:"get",
+						data:{
+							userName : _this.userName,
+							pwd : _this.pwd.val()
+						},
+						url:"login.php",
+						success : function(res){
+							//成功后把数据传递promise
+							suc(res);
+						}
+					});
+				});
+				//登录成功加载商品数据
+				_this.showGoods(pro);
+			});
+		};
+		showGoods(pro){
+			var _this = this;
+			pro.then(function(res){
+				if(res == 1){
+					alert("用户名不存在");
+				}else if(res == 0){
+					alert("密码有误，请重新登录");
+				}else{
+//					_this.userName = res;
+					_this.loginBox.hide();
+					_this.goodsBox.show();
+					_this.cartBox.show();
+					//加载商品数据
+					$.getJSON("goods.json",function(res){
+						//把商品信息保存在goods中
+						_this.goods = res;
+						//把商品展示在页面
+						_this.showGoodsInfo(res);
+						//点击添加购物车
+						_this.addCart();
+						//计算购物车的总条数
+						_this.getCartCount();
+					});
+					
+					//把购物车a标签的href作一个修改，点击跳转时把用户名带到购物车页面去
+					_this.cartBtn.attr("href","cart.html?userName="+res);
+					
+					
+				}
+			});
+		};
+		//把商品展示在页面
+		
+		
+		showGoodsInfo(res){
+			var str = "";
+			for (var i = 0; i < res.length; i++) {
+				str += `
+					<ul>
+						<li>
+							<img src="img/${res[i].src}"/>
+							<p><span>编号：</span><span class="bid">${res[i].bid}</span></p>
+							<p><span>产品：</span><span>${res[i].bookName}</span></p>
+							
+							<p><span>评语人数：</span><span>${res[i].press}</span></p>
+							<p><span>单价：</span><span>${res[i].price}</span></p>
+							<p>加入购物车</p>
+						</li>
+					</ul>
+				
+				`;
+			}
+			this.goodsBox.html(str);
+		};
+		//添加购物车
+		addCart(){
+			var _this = this;
+			this.goodsBox.find("p:last-child").click(function(){
+				//alert($(this).html())
+				var bid = $(this).parent().find(".bid").html();
+				//点击时，要保存当前商品的编号，商品的数量，每点击一次添加1条商品。
+				var obj = [
+					{"bid":bid,"count":1}
+				];
+				
+				var objStr = JSON.stringify(obj);
+				
+				//保存前要判断localStorage是否存在当前点击的这条商品，如果有，在原来商品数量上加1，如果没有，
+				//重新在原来localStorage基础上追加1个商品
+				
+				//把需要的信息保存存在localStorage中
+				//需要明确到底是哪个用户的购物车信息，如何决定到底是哪个用户呢？通过用户名来决定
+				//不同的用户应该有不同的购物车信息(localStorage数据);
+				if(!localStorage.getItem(_this.userName+"Goods")){
+					//当localStorage里面没有任何购物车信息，需要添加何购物车信息
+					localStorage.setItem(_this.userName+"Goods",objStr);
+				}else{
+					//当localStorage里面已经存在购物车信息，要判断当前点击的bid的这个商品在信息里是否存在 
+					//如果有，在原来商品数量上加1，如果没有，重新在原来localStorage基础上追加1个商品
+					var cartGoods = localStorage.getItem(_this.userName+"Goods");
+					var cartGoodsJson = JSON.parse(cartGoods);
+					//一个控制器，用户判断原来的购物车信息中是否存在当前的这个bid商品
+					var flag = false;//false表示购物车信息中是没有当前的这个bid商品
+					for (var i = 0; i < cartGoodsJson.length; i++) {
+						if(cartGoodsJson[i].bid == bid){
+							cartGoodsJson[i].count++;
+							flag = true;//true表示购物车信息中已经存在当前的这个bid商品
+						}
+					}
+					if(!flag){//购物车信息中是没有当前的这个bid商品
+						//追加一条
+						var newBidInfo = {"bid":bid,"count":1};
+						cartGoodsJson.push(newBidInfo);
+					}
+					//添加到localStorage中
+					var cartGoodsJsonToStr = JSON.stringify(cartGoodsJson);
+					localStorage.setItem(_this.userName+"Goods",cartGoodsJsonToStr);
+					
+				}
+				//点击添加购物车时计算购物车商品总条数
+				_this.getCartCount();
+			})
+		};
+		//计算购物车商品总条数
+		getCartCount(){
+			//购物车信息存在，就可以来计算条数了
+			if(localStorage.getItem(this.userName+"Goods")){
+				
+				var cartGoods = localStorage.getItem(this.userName+"Goods");
+				var cartGoodsJson = JSON.parse(cartGoods);
+				//
+				var sum = 0;
+				for (var i = 0; i < cartGoodsJson.length; i++) {
+					sum += cartGoodsJson[i].count;
+				}
+				this.cartGoodsNum.html(sum);
+			}else{
+				return
+			}
+		}
+		
+		
+	}
+
+	
+	
+</script>

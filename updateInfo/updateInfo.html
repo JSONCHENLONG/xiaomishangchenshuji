@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<form action="updateInfo.php" method="post">
+			<input type="hidden" name="sid" id="sid" value="" />
+			姓名：<input type="text" name="name"/><br />
+			性别：<input type="text" name="sex"/><br />
+			年龄：<input type="text" name="age"/><br />
+			<input type="submit" value="修改"/>
+		</form>
+	</body>
+</html>
+<script src="../jquery.min.js"></script>
+<script type="text/javascript">
+	//updateInfo.html?sid=1
+	var input = document.getElementsByTagName("input");
+	var sid = location.search.split("=")[1];
+  
+    $.ajax({
+    	type:"get",
+    	url:"selectInfo.php",
+    	data : {
+			sid : sid
+		},
+    	success : function(res){
+    		console.log(res)
+    	var json = JSON.parse(res);
+			input[0].value = json.sid;
+			input[1].value = json.name;
+			input[2].value = json.sex;
+			input[3].value = json.age;
+		}	
+    });
+
+
+
+
+//	ajax({
+//		method : "get",
+//		url : "selectInfo.php",
+//		data : {
+//			sid : sid
+//		},
+//		success : function(res){
+//			//var arr = eval("("+res+")");
+//			var json = JSON.parse(res);
+//			input[0].value = json.sid;
+//			input[1].value = json.name;
+//			input[2].value = json.sex;
+//			input[3].value = json.age;
+//		}
+//		
+//		
+//	})
+	
+	
+	
+</script>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+	</body>
+</html>
+<script>
+	function People( ){
+       var friends =["lilei","lihua"]
+       var age=18;
+       var obj=new Object( );
+       obj.name="xxx";
+       obj.age=age;
+       obj.friends=friends;
+      return obj;
+}
+var _people=People( )
+var _people2=People( )
+_people.friends===_people2.friends//false
+_people.friends===_people2.friends//ture
+</script>
